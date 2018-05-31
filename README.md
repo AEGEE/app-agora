@@ -21,11 +21,16 @@ AEGEE Agora application for Agora participants.
 }
 ```
 4. Check out Flutter's Github repo, tutorials and examples:
-[Github](https://github.com/flutter/flutter)
-[Tutorials](https://flutter.io/tutorials/layout/)
-[Examples](https://github.com/flutter/flutter/tree/master/examples)
-5. Get "google-services" file for Android or "GoogleService-Info.plist" file for iOS from Firebase:
-[Firebase](https://console.firebase.google.com/u/0/project/app-agora/settings/general/android:com.aegee.appagora)
+
+* [Github](https://github.com/flutter/flutter)
+
+* [Tutorials](https://flutter.io/tutorials/layout/)
+
+* [Examples](https://github.com/flutter/flutter/tree/master/examples)
+
+5. Get "google-services" file for Android or "GoogleService-Info.plist" file for iOS from 
+[Firebase](https://console.firebase.google.com/u/0/project/app-agora/settings/general/android:com.aegee.appagora):
+
 Copy it to:
 app_agora\android\app (Android)
 app_agora\ios\Runner (iOS)
