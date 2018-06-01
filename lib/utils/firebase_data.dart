@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:firebase_database/firebase_database.dart';
-import '../pages/map_page.dart';
+import '../pages/map/map_page.dart';
 import 'shared_preferences.dart';
 import '../pages/news/news_page.dart';
 import '../pages/schedule/schedule_page.dart';
 
-final String gNewsDatabaseKey = "news";
-final String gScheduleDatabaseKey = "schedule";
-final String gPlacesDatabaseKey = "places";
+const String gNewsDatabaseKey = "news";
+const String gScheduleDatabaseKey = "schedule";
+const String gPlacesDatabaseKey = "places";
 
 int fGetDatabaseId(dynamic aDatabaseId, int aDecimalsNumber) {
   String databaseIdString = aDatabaseId.toString();
@@ -39,30 +39,48 @@ class FirebaseData {
       FirebaseDatabase.instance.reference().child(gPlacesDatabaseKey);
   Stream get mPlacesStream => mPlacesStreamController.stream;
 
+  dynamic fGetGlobalVariableBasedOnDatabaseKey(String aDatabaseKey) {
+    dynamic globalVariable;
+    switch (aDatabaseKey) {
+      case gNewsDatabaseKey:
+        globalVariable = gNewsList;
+        break;
+      case gScheduleDatabaseKey:
+        globalVariable = gEventListView;
+        break;
+      case gPlacesDatabaseKey:
+        globalVariable = gPlacesList;
+        break;
+    }
+    return globalVariable;
+  }
+
   void fSubscribeFor(
       StreamSubscription<Event> aSubscription,
       DatabaseReference aRef,
-      dynamic aObject,
       dynamic aFunction,
       String aSharedKey,
       StreamController<bool> aStreamController) {
     print("FirebaseData:fSubscribe:" + aSharedKey);
     aSubscription = aRef.onValue.listen((Event event) {
-      aObject.clear();
-      event.snapshot.value.forEach((aFunction));
+      print("FirebaseData:fSubscribe:listen:" + aSharedKey);
+      dynamic globalVariable = fGetGlobalVariableBasedOnDatabaseKey(aSharedKey);
+      globalVariable.clear();
+      event.snapshot.value.forEach(aFunction);
       try {
-        gPrefs.setString(aSharedKey, json.encode(aObject));
+        String globalVariableJson = json.encode(globalVariable);
+        gPrefs.setString(aSharedKey, globalVariableJson);
       } catch (Exception) {} /* ToDo: Temporary workaround - remove when all objects will be JSON serializable */
       aStreamController.add(true);
     });
   }
 
   void fSubscribe() {
-    fSubscribeFor(mNewsSubscription, mNewsRef, gNewsList, fAddNewsToList,
-        gNewsDatabaseKey, mNewsStreamController);
-    fSubscribeFor(mScheduleSubscription, mScheduleRef, gEventListView,
-        fAddEventToList, gScheduleDatabaseKey, mScheduleStreamController);
-    fSubscribeFor(mPlacesSubscription, mPlacesRef, gPlacesMap, fAddPlaceToMap,
+    fSubscribeFor(mNewsSubscription, mNewsRef, fAddNewsToList, gNewsDatabaseKey,
+        mNewsStreamController);
+    fSubscribeFor(mScheduleSubscription, mScheduleRef, fAddEventToList,
+        gScheduleDatabaseKey, mScheduleStreamController);
+    fSubscribeFor(mPlacesSubscription, mPlacesRef, fAddPlaceToList,
         gPlacesDatabaseKey, mPlacesStreamController);
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../map_page.dart';
+import '../map/map_page.dart';
+import '../map/map_place.dart';
 import 'event_info.dart';
 
 class EventDetailsPageWidget extends StatefulWidget {
@@ -15,7 +16,7 @@ class EventDetailsPage extends State<EventDetailsPageWidget> {
   @override
   Widget build(BuildContext aContext) {
     EventInfo eventInfo = widget.eventInfo;
-    Place eventPlace = gPlacesMap[eventInfo.mPlaceId];
+    MapPlace eventPlace = fGetPlaceById(eventInfo.mPlaceId);
     return new Scaffold(
         appBar: new AppBar(
           title: new Text("Event details"),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages/map_page.dart';
+import 'pages/map/map_page.dart';
 import 'pages/schedule/schedule_page.dart';
 import 'pages/contact_page.dart';
 import 'pages/downloads_page.dart';

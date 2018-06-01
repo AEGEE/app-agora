@@ -1,38 +1,32 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../utils/firebase_data.dart';
+import '../../utils/firebase_data.dart';
+import '../../utils/shared_preferences.dart';
+import 'map_place.dart';
 
-class Place {
-  Place(this.mAddress, this.mName, this.mCoordX, this.mCoordY);
+final List<MapPlace> gPlacesList = new List<MapPlace>();
 
-  String mAddress;
-  String mName;
-  double mCoordX;
-  double mCoordY;
-  void log() {
-    print("Place:" +
-        "mAddress=" +
-        mAddress +
-        ",mName=" +
-        mName +
-        ",mCoordX=" +
-        mCoordX.toString() +
-        ",mCoordY=" +
-        mCoordY.toString());
-  }
-}
-
-void fAddPlaceToMap(aPlaceId, aPlaceInfo) async {
+void fAddPlaceToList(aPlaceId, aPlaceInfo) {
   int placeId = fGetDatabaseId(aPlaceId, 2);
   print("fAddPlaceToMap:id=$placeId");
-  Place place = new Place(aPlaceInfo['address'], aPlaceInfo['name'],
-      aPlaceInfo['coord_x'], aPlaceInfo['coord_y']);
-  gPlacesMap[placeId] = place;
+  MapPlace place = new MapPlace(placeId, aPlaceInfo['address'],
+      aPlaceInfo['name'], aPlaceInfo['coord_x'], aPlaceInfo['coord_y']);
   place.log();
+  gPlacesList.add(place);
 }
 
-Map<int, Place> gPlacesMap = new Map<int, Place>();
+MapPlace fGetPlaceById(int aId) {
+  MapPlace mapPlace;
+  gPlacesList.forEach((aMapPlace) {
+    if (aMapPlace.mId == aId) {
+      mapPlace = aMapPlace;
+      return;
+    }
+  });
+  return mapPlace;
+}
 
 class MapPageWidget extends StatefulWidget {
   const MapPageWidget({Key aKey}) : super(key: aKey);
@@ -72,8 +66,24 @@ class MapPage extends State<MapPageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("MapPage:build:gPlacesMap.values.length=" +
-        gPlacesMap.values.length.toString());
+    if (gPlacesList.length == 0) {
+      String newsJson = gPrefs.getString(gPlacesDatabaseKey);
+      if (newsJson != null) {
+        gPlacesList.addAll(json.decode(newsJson).map<MapPlace>((mapPlace) {
+          return new MapPlace(mapPlace['mId'], mapPlace['mAddress'],
+              mapPlace['mName'], mapPlace['mCoordX'], mapPlace['mCoordY']);
+        }).toList());
+      }
+    }
+    gPlacesList.sort((firstMapPlace, secondMapPlace) {
+      if (firstMapPlace.mId > secondMapPlace.mId) {
+        return 1;
+      } else {
+        return -1;
+      }
+    });
+    print("MapPage:build:gPlacesList.values.length=" +
+        gPlacesList.length.toString());
     return new Scaffold(
         body: new Column(
       children: <Widget>[
@@ -84,16 +94,16 @@ class MapPage extends State<MapPageWidget> {
         ),
         new Expanded(
           child: new ListView.builder(
-              itemCount: gPlacesMap.values.length,
+              itemCount: gPlacesList.length,
               padding: const EdgeInsets.only(top: 10.0),
               itemExtent: 80.0,
               itemBuilder: (context, index) {
                 return new Card(
                   child: new ListTile(
-                    title: new Text(gPlacesMap[index].mName),
-                    subtitle: new Text(gPlacesMap[index].mAddress),
+                    title: new Text(gPlacesList[index].mName),
+                    subtitle: new Text(gPlacesList[index].mAddress),
                     onTap: () => fNavigateTo(
-                        gPlacesMap[index].mCoordX, gPlacesMap[index].mCoordY),
+                        gPlacesList[index].mCoordX, gPlacesList[index].mCoordY),
                   ),
                 );
               }),

@@ -5,7 +5,7 @@ import '../../utils/firebase_data.dart';
 import '../../utils/shared_preferences.dart';
 import 'news_info.dart';
 
-List<NewsInfo> gNewsList = new List<NewsInfo>();
+final List<NewsInfo> gNewsList = new List<NewsInfo>();
 
 void fAddNewsToList(aNewsId, aNewsInfo) {
   print("FirebaseData:fAddNewsToList");
@@ -45,9 +45,9 @@ class NewsPage extends State<NewsPageWidget> {
     if (gNewsList.length == 0) {
       String newsJson = gPrefs.getString(gNewsDatabaseKey);
       if (newsJson != null) {
-        gNewsList = json.decode(newsJson).map<NewsInfo>((newsInfo) {
+        gNewsList.addAll(json.decode(newsJson).map<NewsInfo>((newsInfo) {
           return new NewsInfo(newsInfo['mTitle'], newsInfo['mBody']);
-        }).toList();
+        }).toList());
       }
     }
     return new Scaffold(
