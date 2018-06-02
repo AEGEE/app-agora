@@ -1,15 +1,36 @@
 import 'dart:collection';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:core';
 import "package:intl/date_symbols.dart";
 import 'package:flutter/material.dart';
 import '../../utils/firebase_data.dart';
+import '../../utils/shared_preferences.dart';
+import 'day_events_info.dart';
 import 'event_info.dart';
 import 'day_events_list_view.dart';
+
+DayEventsMap gDayEventsMap = new DayEventsMap(fCompareDayTab);
+
+class DayEventsMap extends SplayTreeMap<DayTab, DayEventsListView> {
+  DayEventsMap(aCompareTo) : super(aCompareTo);
+}
 
 class DayTab extends Tab {
   DayTab(this.mDateTime, aTitle) : super(text: aTitle);
   final DateTime mDateTime;
+}
+
+void fGetScheduleFromMemory() {
+  String scheduleJson = gPrefs.getString(gScheduleDatabaseKey);
+  if (scheduleJson != null) {
+    List<DayEventsInfo> dayEventsInfoList = new List<DayEventsInfo>();
+    json.decode(scheduleJson).forEach((dayEventsInfo) {
+      dayEventsInfoList.add(new DayEventsInfo.fromJson(dayEventsInfo));
+    });
+    gDayEventsMap
+        .addAll(fCreateSplayTreeMapFromDayEventsInfoList(dayEventsInfoList));
+  }
 }
 
 int fCompareDays(DateTime aLeftDateTime, DateTime aRightDateTime) {
@@ -44,9 +65,6 @@ int fCompareDayTab(DayTab aLeftDayTab, DayTab aRightDayTab) {
   return fCompareDays(aLeftDayTab.mDateTime, aRightDayTab.mDateTime);
 }
 
-SplayTreeMap<DayTab, DayEventsListView> gEventListView =
-    new SplayTreeMap<DayTab, DayEventsListView>(fCompareDayTab);
-
 void fAddEventToList(aEventId, aEventInfo) {
   print("fAddEventToList");
   EventInfo eventInfo = new EventInfo(
@@ -60,7 +78,7 @@ void fAddEventToList(aEventId, aEventInfo) {
 
   bool dayAlreadyInList = false;
   try {
-    gEventListView.forEach((aDayTab, aDayEventsListView) {
+    gDayEventsMap.forEach((aDayTab, aDayEventsListView) {
       int result = fCompareDays(aDayTab.mDateTime, eventInfo.mStartTime);
       print("fAddEventToList:result=$result");
       if (result == 0) {
@@ -79,8 +97,8 @@ void fAddEventToList(aEventId, aEventInfo) {
         " " +
         en_USSymbols.SHORTMONTHS[eventInfo.mStartTime.month - 1];
     DayTab dayTab = new DayTab(eventInfo.mStartTime, weekday);
-    gEventListView[dayTab] = new DayEventsListView();
-    gEventListView[dayTab].mEventInfoList.add(eventInfo);
+    gDayEventsMap[dayTab] = new DayEventsListView();
+    gDayEventsMap[dayTab].mEventInfoList.add(eventInfo);
   }
 }
 
@@ -99,7 +117,7 @@ class SchedulePage extends State<SchedulePageWidget>
     int index = 0;
     bool indexFound = false;
     try {
-      gEventListView.forEach((aDayTab, aDayEventsListView) {
+      gDayEventsMap.forEach((aDayTab, aDayEventsListView) {
         int result = fCompareDays(aDayTab.mDateTime, DateTime.now());
         if (result == 0) {
           indexFound = true;
@@ -137,25 +155,23 @@ class SchedulePage extends State<SchedulePageWidget>
 
   @override
   Widget build(BuildContext aContext) {
-    print(
-        "SchedulePage:build:gDays.length=" + gEventListView.length.toString());
-
-    if (gEventListView.length > 0) {
+    print("SchedulePage:build:gDays.length=" + gDayEventsMap.length.toString());
+    if (gDayEventsMap.length > 0) {
       int previousIndex = fFindTodayDayTabIndex();
       if (mTabController != null) {
         previousIndex = mTabController.index;
       }
       mTabController =
-          new TabController(vsync: this, length: gEventListView.length + 1);
+          new TabController(vsync: this, length: gDayEventsMap.length + 1);
       mTabController.animateTo(previousIndex);
       TabBar dayTabBar = new TabBar(
         isScrollable: true,
         controller: mTabController,
-        tabs: List.from(gEventListView.keys),
+        tabs: List.from(gDayEventsMap.keys),
       );
 
       return new DefaultTabController(
-        length: gEventListView.length + 1,
+        length: gDayEventsMap.length + 1,
         child: new Scaffold(
           appBar: new AppBar(
             bottom: new PreferredSize(
@@ -165,7 +181,7 @@ class SchedulePage extends State<SchedulePageWidget>
           ),
           body: new TabBarView(
               controller: mTabController,
-              children: List.from(gEventListView.values)),
+              children: List.from(gDayEventsMap.values)),
         ),
       );
     } else {

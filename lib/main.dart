@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'pages/map/map_page.dart';
 import 'pages/schedule/schedule_page.dart';
-import 'pages/contact_page.dart';
+import 'pages/contact/contact_page.dart';
 import 'pages/downloads_page.dart';
 import 'pages/news/news_page.dart';
 import 'utils/firebase_data.dart';

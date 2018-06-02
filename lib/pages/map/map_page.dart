@@ -8,6 +8,16 @@ import 'map_place.dart';
 
 final List<MapPlace> gPlacesList = new List<MapPlace>();
 
+void fGetPlacesFromMemory() {
+  String placesJson = gPrefs.getString(gPlacesDatabaseKey);
+  if (placesJson != null) {
+    gPlacesList.addAll(json.decode(placesJson).map<MapPlace>((mapPlace) {
+      return new MapPlace(mapPlace['mId'], mapPlace['mAddress'],
+          mapPlace['mName'], mapPlace['mCoordX'], mapPlace['mCoordY']);
+    }).toList());
+  }
+}
+
 void fAddPlaceToList(aPlaceId, aPlaceInfo) {
   int placeId = fGetDatabaseId(aPlaceId, 2);
   print("fAddPlaceToMap:id=$placeId");
@@ -66,15 +76,7 @@ class MapPage extends State<MapPageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (gPlacesList.length == 0) {
-      String newsJson = gPrefs.getString(gPlacesDatabaseKey);
-      if (newsJson != null) {
-        gPlacesList.addAll(json.decode(newsJson).map<MapPlace>((mapPlace) {
-          return new MapPlace(mapPlace['mId'], mapPlace['mAddress'],
-              mapPlace['mName'], mapPlace['mCoordX'], mapPlace['mCoordY']);
-        }).toList());
-      }
-    }
+    print("MapPage:build:gPlacesList.length=" + gPlacesList.length.toString());
     gPlacesList.sort((firstMapPlace, secondMapPlace) {
       if (firstMapPlace.mId > secondMapPlace.mId) {
         return 1;
@@ -82,8 +84,6 @@ class MapPage extends State<MapPageWidget> {
         return -1;
       }
     });
-    print("MapPage:build:gPlacesList.values.length=" +
-        gPlacesList.length.toString());
     return new Scaffold(
         body: new Column(
       children: <Widget>[

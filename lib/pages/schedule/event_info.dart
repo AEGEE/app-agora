@@ -1,4 +1,9 @@
-class EventInfo {
+import 'package:json_annotation/json_annotation.dart';
+
+part 'event_info.g.dart';
+
+@JsonSerializable()
+class EventInfo extends Object with _$EventInfoSerializerMixin {
   EventInfo(this.mId, this.mTitle, this.mBody, this.mPlaceId, this.mStartTime,
       this.mEndTime);
 
@@ -34,4 +39,7 @@ class EventInfo {
       return -1;
     }
   }
+
+  factory EventInfo.fromJson(Map<String, dynamic> json) =>
+      _$EventInfoFromJson(json);
 }

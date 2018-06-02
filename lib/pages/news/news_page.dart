@@ -7,9 +7,21 @@ import 'news_info.dart';
 
 final List<NewsInfo> gNewsList = new List<NewsInfo>();
 
+void fGetNewsFromMemory() {
+  String newsJson = gPrefs.getString(gNewsDatabaseKey);
+  if (newsJson != null) {
+    gNewsList.addAll(json.decode(newsJson).map<NewsInfo>((newsInfo) {
+      return new NewsInfo(
+          newsInfo['mId'], newsInfo['mTitle'], newsInfo['mBody']);
+    }).toList());
+  }
+}
+
 void fAddNewsToList(aNewsId, aNewsInfo) {
+  int newsId = fGetDatabaseId(aNewsId, 3);
   print("FirebaseData:fAddNewsToList");
-  NewsInfo newsInfo = new NewsInfo(aNewsInfo["title"], aNewsInfo["body"]);
+  NewsInfo newsInfo =
+      new NewsInfo(newsId, aNewsInfo["title"], aNewsInfo["body"]);
   newsInfo.log();
   gNewsList.add(newsInfo);
 }
@@ -42,14 +54,13 @@ class NewsPage extends State<NewsPageWidget> {
   @override
   Widget build(BuildContext context) {
     print("NewsPage:build:gNewsList.length=" + gNewsList.length.toString());
-    if (gNewsList.length == 0) {
-      String newsJson = gPrefs.getString(gNewsDatabaseKey);
-      if (newsJson != null) {
-        gNewsList.addAll(json.decode(newsJson).map<NewsInfo>((newsInfo) {
-          return new NewsInfo(newsInfo['mTitle'], newsInfo['mBody']);
-        }).toList());
+    gNewsList.sort((firstNews, secondNews) {
+      if (firstNews.mId > secondNews.mId) {
+        return 1;
+      } else {
+        return -1;
       }
-    }
+    });
     return new Scaffold(
         body: new ListView.builder(
             itemCount: gNewsList.length,

@@ -1,29 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'map_place.dart';
+part of 'contact_info.dart';
 
 // **************************************************************************
 // Generator: JsonSerializableGenerator
 // **************************************************************************
 
-MapPlace _$MapPlaceFromJson(Map<String, dynamic> json) => new MapPlace(
+ContactInfo _$ContactInfoFromJson(Map<String, dynamic> json) => new ContactInfo(
     json['mId'] as int,
-    json['mAddress'] as String,
     json['mName'] as String,
-    (json['mCoordX'] as num)?.toDouble(),
-    (json['mCoordY'] as num)?.toDouble());
+    json['mDescription'] as String,
+    json['mPhoneNumber'] as String);
 
-abstract class _$MapPlaceSerializerMixin {
+abstract class _$ContactInfoSerializerMixin {
   int get mId;
-  String get mAddress;
   String get mName;
-  double get mCoordX;
-  double get mCoordY;
+  String get mDescription;
+  String get mPhoneNumber;
   Map<String, dynamic> toJson() => <String, dynamic>{
         'mId': mId,
-        'mAddress': mAddress,
         'mName': mName,
-        'mCoordX': mCoordX,
-        'mCoordY': mCoordY
+        'mDescription': mDescription,
+        'mPhoneNumber': mPhoneNumber
       };
 }
