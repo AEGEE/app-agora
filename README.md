@@ -32,7 +32,7 @@ app_agora\android\app (Android)
 
 app_agora\ios\Runner (iOS)
 
-6. Coding standard
+## Coding standard
 
 Please use same coding standard as is used already.
 
@@ -48,7 +48,7 @@ Please use same coding standard as is used already.
 
 * Name local variables using lowerCamelCase: e.g. googleMapUrl
 
-7. Troubleshooting
+## Troubleshooting
 
 * Upgrade your Flutter version [Upgrade](https://flutter.io/upgrading/)
 

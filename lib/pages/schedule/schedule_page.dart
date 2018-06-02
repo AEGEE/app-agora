@@ -138,7 +138,7 @@ class SchedulePage extends State<SchedulePageWidget>
     print("SchedulePage:initState");
     super.initState();
     mScheduleStreamSubscription =
-        gFirebaseData.mScheduleStream.listen((aNewsInfo) {
+        gFirebaseDataSchedule.mStreamController.stream.listen((aNewsInfo) {
       setState(() {});
     });
   }

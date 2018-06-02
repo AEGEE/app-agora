@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'pages/map/map_page.dart';
 import 'pages/schedule/schedule_page.dart';
 import 'pages/contact/contact_page.dart';
-import 'pages/downloads_page.dart';
+import 'pages/links/links_page.dart';
 import 'pages/news/news_page.dart';
 import 'utils/firebase_data.dart';
 import 'utils/firebase_messaging.dart';
@@ -13,7 +13,7 @@ HomePage gHomePage = new HomePage();
 void main() async {
   await fInitSharedPreferences();
   fInitFirebaseMessaging();
-  gFirebaseData.fSubscribe();
+  fInitFirebaseData();
   runApp(new AgoraApp());
 }
 
@@ -53,7 +53,7 @@ class HomePage extends State<HomePageWidget> {
   MapPageWidget mMapPageWidget = new MapPageWidget();
   SchedulePageWidget mSchedulePageWidget = new SchedulePageWidget();
   ContactPageWidget mContactPageWidget = new ContactPageWidget();
-  DownloadsPageWidget mDownloadsPageWidget = new DownloadsPageWidget();
+  LinksPageWidget mLinksPageWidget = new LinksPageWidget();
 
   @override
   void initState() {
@@ -67,7 +67,7 @@ class HomePage extends State<HomePageWidget> {
   void dispose() {
     print("HomePage:dispose");
     super.dispose();
-    gFirebaseData.fUnsubscribe();
+    fCloseFirebaseData();
   }
 
   @override
@@ -89,7 +89,7 @@ class HomePage extends State<HomePageWidget> {
               new Divider(),
               new MenuItem("Contact", mContactPageWidget),
               new Divider(),
-              new MenuItem("Downloads", mDownloadsPageWidget),
+              new MenuItem("Links", mLinksPageWidget),
             ],
           ),
         ),

@@ -44,7 +44,7 @@ class ContactPage extends State<ContactPageWidget> {
     print("ContactPage:initState");
     super.initState();
     mContactsStreamSubscription =
-        gFirebaseData.mContactsStream.listen((aContactInfo) {
+        gFirebaseDataContacts.mStreamController.stream.listen((aContactInfo) {
       setState(() {});
     });
   }

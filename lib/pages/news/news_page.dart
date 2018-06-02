@@ -39,7 +39,8 @@ class NewsPage extends State<NewsPageWidget> {
   void initState() {
     print("NewsPage:initState");
     super.initState();
-    mNewsStreamSubscription = gFirebaseData.mNewsStream.listen((aNewsInfo) {
+    mNewsStreamSubscription =
+        gFirebaseDataNews.mStreamController.stream.listen((aNewsInfo) {
       setState(() {});
     });
   }

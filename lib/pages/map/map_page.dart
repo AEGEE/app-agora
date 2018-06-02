@@ -62,7 +62,8 @@ class MapPage extends State<MapPageWidget> {
   void initState() {
     print("MapPage:initState");
     super.initState();
-    mPlacesStreamSubscription = gFirebaseData.mNewsStream.listen((aNewsInfo) {
+    mPlacesStreamSubscription =
+        gFirebaseDataPlaces.mStreamController.stream.listen((aNewsInfo) {
       setState(() {});
     });
   }
