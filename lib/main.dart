@@ -30,13 +30,24 @@ class AgoraApp extends StatelessWidget {
   }
 }
 
-class MenuItem extends ListTile {
-  MenuItem(String aTitle, Widget aPage)
-      : super(
-            title: new Text(aTitle),
+class MenuItem extends StatelessWidget {
+  MenuItem(this.mTitle, this.mPage);
+  final String mTitle;
+  final Widget mPage;
+
+  @override
+  Widget build(BuildContext context) {
+    return new Card(
+        child: new ListTile(
+            title: new Text(mTitle,
+                style: new TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18.0)),
             onTap: () {
-              gHomePage.fChangePage(aTitle, aPage);
-            });
+              gHomePage.fChangePage(mTitle, mPage);
+            }));
+  }
 }
 
 class HomePageWidget extends StatefulWidget {
@@ -79,16 +90,12 @@ class HomePage extends State<HomePageWidget> {
         ),
         drawer: new Drawer(
           child: new ListView(
-            padding: new EdgeInsets.fromLTRB(20.0, 40.0, 0.0, 0.0),
+            padding: new EdgeInsets.fromLTRB(15.0, 50.0, 50.0, 0.0),
             children: <Widget>[
               new MenuItem("News", mNewsPageWidget),
-              new Divider(),
               new MenuItem("Map", mMapPageWidget),
-              new Divider(),
               new MenuItem("Schedule", mSchedulePageWidget),
-              new Divider(),
               new MenuItem("Contact", mContactPageWidget),
-              new Divider(),
               new MenuItem("Links", mLinksPageWidget),
             ],
           ),

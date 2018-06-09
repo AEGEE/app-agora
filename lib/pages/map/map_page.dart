@@ -101,7 +101,11 @@ class MapPage extends State<MapPageWidget> {
               itemBuilder: (context, index) {
                 return new Card(
                   child: new ListTile(
-                    title: new Text(gPlacesList[index].mName),
+                    title: new Text(gPlacesList[index].mName,
+                        style: new TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0)),
                     subtitle: new Text(gPlacesList[index].mAddress),
                     onTap: () => fNavigateTo(
                         gPlacesList[index].mCoordX, gPlacesList[index].mCoordY),

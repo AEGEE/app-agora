@@ -65,11 +65,13 @@ class EventDetailsPage extends State<EventDetailsPageWidget> {
                               new Padding(padding: EdgeInsets.all(10.0)),
                               new Text(
                                 eventPlace.mName,
+                                textAlign: TextAlign.center,
                                 style: new TextStyle(fontSize: 20.0),
                               ),
                               new Padding(padding: EdgeInsets.all(5.0)),
                               new Text(
                                 eventPlace.mAddress,
+                                textAlign: TextAlign.center,
                                 style: new TextStyle(fontSize: 20.0),
                               ),
                               new Padding(padding: EdgeInsets.all(5.0)),

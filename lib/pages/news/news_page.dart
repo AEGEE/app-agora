@@ -70,10 +70,11 @@ class NewsPage extends State<NewsPageWidget> {
               return new Card(
                 child: new ListTile(
                   title: new Text(gNewsList[index].mTitle,
-                      style: new TextStyle(color: Colors.blue),
-                      textAlign: TextAlign.center),
-                  subtitle: new Text(gNewsList[index].mBody,
-                      textAlign: TextAlign.center),
+                      style: new TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.0)),
+                  subtitle: new Text(gNewsList[index].mBody),
                 ),
               );
             }));
