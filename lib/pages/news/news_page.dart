@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:async';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../../utils/firebase_data.dart';
 import '../../utils/shared_preferences.dart';
+import '../login/login_page.dart';
 import 'news_info.dart';
 
 final List<NewsInfo> gNewsList = new List<NewsInfo>();
@@ -22,7 +24,7 @@ void fAddNewsToList(aNewsId, aNewsInfo) {
   print("FirebaseData:fAddNewsToList");
   NewsInfo newsInfo =
       new NewsInfo(newsId, aNewsInfo["title"], aNewsInfo["body"]);
-  newsInfo.log();
+  newsInfo.fLog();
   gNewsList.add(newsInfo);
 }
 
@@ -34,6 +36,59 @@ class NewsPageWidget extends StatefulWidget {
 
 class NewsPage extends State<NewsPageWidget> {
   StreamSubscription<bool> mNewsStreamSubscription;
+  TextEditingController mNewsTitleTextEditingController =
+      TextEditingController();
+  TextEditingController mNewsBodyTextEditingController =
+      TextEditingController();
+
+  void fAddNews() {
+    NewsInfo newsInfo = new NewsInfo(0, mNewsTitleTextEditingController.text,
+        mNewsBodyTextEditingController.text);
+    DatabaseReference reference = FirebaseDatabase.instance.reference().child(
+        "news/news" + (gNewsList.last.mId + 1).toString().padLeft(3, '0'));
+    reference.set(newsInfo.fToAdminNewsJson());
+  }
+
+  Future<Null> fAddNewsDialog() async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return new SimpleDialog(
+            title: const Text('Enter news details'),
+            children: <Widget>[
+              new SimpleDialogOption(
+                child: new SizedBox(
+                    width: 250.0,
+                    height: 60.0,
+                    child: new TextField(
+                      controller: mNewsTitleTextEditingController,
+                      decoration: new InputDecoration(
+                        hintText: "Title",
+                      ),
+                    )),
+              ),
+              new SimpleDialogOption(
+                child: new SizedBox(
+                    width: 250.0,
+                    height: 60.0,
+                    child: new TextField(
+                      controller: mNewsBodyTextEditingController,
+                      decoration: new InputDecoration(
+                        hintText: "Body",
+                      ),
+                    )),
+              ),
+              new FlatButton(
+                child: new Text('Ok'),
+                onPressed: () {
+                  fAddNews();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
 
   @override
   void initState() {
@@ -62,6 +117,13 @@ class NewsPage extends State<NewsPageWidget> {
         return -1;
       }
     });
+    FloatingActionButton addNewNewsButton;
+    if (gWhoAmI == AccountType.ADMIN) {
+      addNewNewsButton = new FloatingActionButton(
+          child: new Icon(Icons.add),
+          backgroundColor: Colors.blue,
+          onPressed: fAddNewsDialog);
+    }
     return new Scaffold(
         body: new ListView.builder(
             itemCount: gNewsList.length,
@@ -77,6 +139,7 @@ class NewsPage extends State<NewsPageWidget> {
                   subtitle: new Text(gNewsList[index].mBody),
                 ),
               );
-            }));
+            }),
+        floatingActionButton: addNewNewsButton);
   }
 }

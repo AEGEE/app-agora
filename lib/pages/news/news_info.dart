@@ -10,8 +10,12 @@ class NewsInfo extends Object with _$NewsInfoSerializerMixin {
   String mTitle;
   String mBody;
 
-  void log() {
+  void fLog() {
     print("NewsInfo:mId=$mId,mTitle=$mTitle,mBody=$mBody");
+  }
+
+  fToAdminNewsJson() {
+    return {"title": mTitle, "body": mBody};
   }
 
   factory NewsInfo.fromJson(Map<String, dynamic> json) =>
