@@ -46,15 +46,45 @@ class NewsPage extends State<NewsPageWidget> {
         mNewsBodyTextEditingController.text);
     DatabaseReference reference = FirebaseDatabase.instance.reference().child(
         "news/news" + (gNewsList.last.mId + 1).toString().padLeft(3, '0'));
+
     reference.set(newsInfo.fToAdminNewsJson());
   }
 
-  Future<Null> fAddNewsDialog() async {
+  void fEditNews(int aNewsIndex) {
+    NewsInfo newsInfo = new NewsInfo.fromNewsInfo(gNewsList[aNewsIndex]);
+    newsInfo.mTitle = mNewsTitleTextEditingController.text;
+    newsInfo.mBody = mNewsBodyTextEditingController.text;
+    DatabaseReference reference = FirebaseDatabase.instance
+        .reference()
+        .child("news/news" + (newsInfo.mId).toString().padLeft(3, '0'));
+    reference.set(newsInfo.fToAdminNewsJson());
+  }
+
+  void fRemoveNews(int aNewsIndex) {
+    NewsInfo newsInfo = new NewsInfo.fromNewsInfo(gNewsList[aNewsIndex]);
+    DatabaseReference reference = FirebaseDatabase.instance
+        .reference()
+        .child("news/news" + (newsInfo.mId).toString().padLeft(3, '0'));
+    reference.set(null);
+  }
+
+  Future<Null> fNewsDialog(bool aAddNewNews, [int aNewsIndex = -1]) async {
+    String title;
+    if (aAddNewNews) {
+      title = 'Enter news details';
+      mNewsTitleTextEditingController.text = "";
+      mNewsBodyTextEditingController.text = "";
+    } else {
+      title = 'Edit news details';
+      NewsInfo newsInfo = gNewsList[aNewsIndex];
+      mNewsTitleTextEditingController.text = newsInfo.mTitle;
+      mNewsBodyTextEditingController.text = newsInfo.mBody;
+    }
     await showDialog(
         context: context,
         builder: (BuildContext context) {
           return new SimpleDialog(
-            title: const Text('Enter news details'),
+            title: Text(title),
             children: <Widget>[
               new SimpleDialogOption(
                 child: new SizedBox(
@@ -78,12 +108,31 @@ class NewsPage extends State<NewsPageWidget> {
                       ),
                     )),
               ),
-              new FlatButton(
-                child: new Text('Ok'),
-                onPressed: () {
-                  fAddNews();
-                  Navigator.of(context).pop();
-                },
+              Row(
+                children: <Widget>[
+                  new Expanded(
+                    child: new FlatButton(
+                      child: new Text('Remove'),
+                      onPressed: () {
+                        fRemoveNews(aNewsIndex);
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: new FlatButton(
+                      child: new Text('Ok'),
+                      onPressed: () {
+                        if (aAddNewNews) {
+                          fAddNews();
+                        } else {
+                          fEditNews(aNewsIndex);
+                        }
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ],
               ),
             ],
           );
@@ -122,7 +171,9 @@ class NewsPage extends State<NewsPageWidget> {
       addNewNewsButton = new FloatingActionButton(
           child: new Icon(Icons.add),
           backgroundColor: Colors.blue,
-          onPressed: fAddNewsDialog);
+          onPressed: () {
+            fNewsDialog(true);
+          });
     }
     return new Scaffold(
         body: new ListView.builder(
@@ -131,6 +182,9 @@ class NewsPage extends State<NewsPageWidget> {
             itemBuilder: (context, index) {
               return new Card(
                 child: new ListTile(
+                  onTap: () {
+                    fNewsDialog(false, index);
+                  },
                   title: new Text(gNewsList[index].mTitle,
                       style: new TextStyle(
                           color: Colors.blue,

@@ -10,6 +10,12 @@ class NewsInfo extends Object with _$NewsInfoSerializerMixin {
   String mTitle;
   String mBody;
 
+  NewsInfo.fromNewsInfo(NewsInfo aNewsInfo) {
+    this.mId = aNewsInfo.mId;
+    this.mTitle = aNewsInfo.mTitle;
+    this.mBody = aNewsInfo.mBody;
+  }
+
   void fLog() {
     print("NewsInfo:mId=$mId,mTitle=$mTitle,mBody=$mBody");
   }
